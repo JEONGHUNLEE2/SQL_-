@@ -147,3 +147,36 @@
   - LEAD(salary, 1, 0) OVER : 1은 다음꺼라는 뜻, 2 입력하면 다다음, 0입력 위치는 null 이면 0으로 출력 해달라는 뜻
  LAG(expr, offset, default) : 선행 로우값
 
+-------------------------------------------------------------------------------------------------------------
+
+6주차
+
+
+중첩쿼리
+-IN(서브쿼리에서 반환하는 값이 포함된 건만 조회)
+SELECT employee_id,
+    first_name || ' ' || last_name emp_name,
+    job_id,
+    salary
+    FROM employees
+    WHERE (job_id, salary ) IN ( SELECT job_id, min_salary
+                                  FROM jobs)
+    ORDER BY 1;
+
+                     
+-EXIST(존재하는지를 체크)
+SELECT *
+  FROM departments a
+  WHERE EXISTS
+          ( SELECT 1 #1은 아무의미 없음
+          FROM employees b
+          WHERE a.department_id = b.department_id
+          ) ;
+
+-SELECT department_id, employee_id, last_name, salary
+  FROM employees a
+  WHERE salary > (SELECT AVG(salary)
+                  FROM employees b
+                  WHERE a.department_id = b.department_id
+                  group by b.department_id)
+  ORDER BY department_id;
