@@ -150,44 +150,78 @@
 -------------------------------------------------------------------------------------------------------------
 
 6주차
+서브쿼리
+ 스칼라 서브쿼리 (Scalar Subquery)
+    SELECT a.employee_id,
+        a.first_name || ' ' || a.last_name emp_name,
+        a.department_id,
+        ( SELECT b.department_name
+        FROM departments b
+        WHERE a.department_id = b.department_id ) dept_name
+        FROM employees a
+        ORDER BY 1;
+
+ 인라인 뷰 (Inline View)---- 가장 많이 사용 / 여러가지 계산식 있을 때?
+     SELECT a.department_id, a.employee_id,
+                             a.last_name, a.salary,
+                             k.department_id second_dept_id,
+                             k.avg_salary
+    FROM employees a,
+      (SELECT b.department_id, AVG(b.salary) avg_salary
+      FROM employees b
+      GROUP BY b.department_id
+      ) k
+    WHERE a.department_id = k.department_id
+    ORDER BY a.department_id;
 
 
 중첩쿼리
 -IN(서브쿼리에서 반환하는 값이 포함된 건만 조회)
-SELECT employee_id,
-    first_name || ' ' || last_name emp_name,
-    job_id,
-    salary
-    FROM employees
-    WHERE (job_id, salary ) IN ( SELECT job_id, min_salary
-                                  FROM jobs)
-    ORDER BY 1;
+  SELECT employee_id,
+      first_name || ' ' || last_name emp_name,
+      job_id,
+      salary
+      FROM employees
+      WHERE (job_id, salary ) IN ( SELECT job_id, min_salary
+                                    FROM jobs)
+      ORDER BY 1;
 
                      
 -EXIST(존재하는지를 체크)
-SELECT *
-  FROM departments a
-  WHERE EXISTS
-          ( SELECT 1 #1은 아무의미 없음
-          FROM employees b
-          WHERE a.department_id = b.department_id
-          ) ;
+  SELECT *
+    FROM departments a
+    WHERE EXISTS
+            ( SELECT 1 #1은 아무의미 없음
+            FROM employees b
+            WHERE a.department_id = b.department_id
+            ) ;
 
--SELECT department_id, employee_id, last_name, salary
-  FROM employees a
-  WHERE salary > (SELECT AVG(salary)
-                  FROM employees b
-                  WHERE a.department_id = b.department_id
-                  group by b.department_id)
-  ORDER BY department_id;
-  
--서브쿼리와의 조인조건에 부합하지 않는 건을 조회, job_history에 없는 사원 조회
- SELECT a.employee_id,
+   SELECT department_id, employee_id, last_name, salary
+    FROM employees a
+    WHERE salary > (SELECT AVG(salary)
+                    FROM employees b
+                    WHERE a.department_id = b.department_id
+                    group by b.department_id)
+    ORDER BY department_id;
+ 
+ 
+세미 조인 (Semi Join) : 두 번째 테이블에 있는 로우와 조건이 맞는 첫 번째 테이블의 로우 반환 **
+ SELECT *                                                    SELECT *
+    FROM departments                                            FROM departments a
+    WHERE department_id IN                                      WHERE EXISTS
+                          ( SELECT department_id                            ( SELECT 1
+                          FROM employees                                      FROM employees b
+                          ) ;                                                 WHERE a.department_id = b.department_id) ;
+
+
+안티 조인 (Anti Join) : 세미 조인에서 NOT 연산자 사용하는 조인
+   SELECT a.employee_id,
         a.first_name || ' ' || a.last_name
         FROM employees a
         WHERE a.employee_id
                           NOT IN ( SELECT employee_id
                           FROM job_history )
         ORDER BY 1;
+   해석 :서브쿼리와의 조인조건에 부합하지 않는 건을 조회, job_history에 없는 사원 조회
 
--
+
