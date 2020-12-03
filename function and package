@@ -180,3 +180,14 @@ SELECT *
                   WHERE a.department_id = b.department_id
                   group by b.department_id)
   ORDER BY department_id;
+  
+-서브쿼리와의 조인조건에 부합하지 않는 건을 조회, job_history에 없는 사원 조회
+ SELECT a.employee_id,
+        a.first_name || ' ' || a.last_name
+        FROM employees a
+        WHERE a.employee_id
+                          NOT IN ( SELECT employee_id
+                          FROM job_history )
+        ORDER BY 1;
+
+-
