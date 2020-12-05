@@ -225,3 +225,38 @@
    해석 :서브쿼리와의 조인조건에 부합하지 않는 건을 조회, job_history에 없는 사원 조회
 
 
+ WITH 절 or CTE 
+  - 아직 잘몰라서 정리 x
+  
+ Top n Query
+  -  특정 컬럼 값을 기준으로 상위 n개, 혹은 하위 n개 로우를 조회하는 쿼리
+
+ SELECT a.employee_id,
+        a.first_name || ' ' || a.last_name emp_name,
+        a.salary
+    FROM employees a
+    ORDER BY a.salary DESC
+    FETCH FIRST 5 PERCENT ROWS ONLY; /(FETCH FIRST 5 ROWS ONLY도 가능) / (FETCH FIRST 5 PERCENT ROWS WITH TIES - 같은 값도 조회)
+
+ 
+ 로우를 컬럼으로 – PIVOT 절 사용
+  SELECT *
+    FROM ( SELECT years, gubun, subjects, score
+    FROM score_table )
+    PIVOT ( SUM(score)
+    FOR subjects IN ( '국어', '영어', '수학', '과학', '지리', '독일어')
+    
+    
+ 컬럼을 로우로 – UNPIVOT절 사용
+  SELECT *
+    FROM score_col_table
+    UNPIVOT ( score
+    FOR subjects IN ( KOREAN AS '국어',
+    ENGLISH AS '영어',
+    MATH AS '수학',
+    SCIENCE AS '과학',
+    GEOLOGY AS '지리',
+    GERMAN AS '독일어')
+    ); 
+
+    
