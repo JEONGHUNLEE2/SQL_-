@@ -139,7 +139,8 @@
  
  분석함수 (select 절에)
  '분석 함수' OVER ( PARTITION BY col1, col2, …  ORDER BY col1, col2…)
-   
+  GROUP BY 절 사용 시, 집계 대상에 따라 로우 수가 줄어들지만, 분석함수는 그렇지 않음, 로우 수는 그대로, 집계 값 산출이 가능
+  
  row_number() : 일련번호
  RANK() : 순위
  DENSE_RANK() : 누적순위
