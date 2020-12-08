@@ -271,4 +271,54 @@
     GERMAN AS '독일어')
     ); 
 
-    
+------------------------------------------------------------------------------------------------------------------------------------------
+
+7주차
+ 데이터 입력, 수정, 삭제 : 보통 회사가면 생성,수정 변경 권한은 안줌! 그래서 select절로 작업하는게 대다수
+ 
+ INSERT 문 : 컬럼과 value의 갯수가 동일해야하고, 컬럼생략하면 데이터가 모든 컬럼에 입력, NOT NULL 타입의 데이터는 반드시 입력해야함. 
+ 구문1)
+ INSERT INTO EMP ( emp_no, emp_name, salary, hire_date)
+  VALUES (1, '홍길동', 1000, '2020-06-01');
+ 
+ 구문2) - 많이 사용
+  INSERT INTO EMP
+   SELECT employee_id, first_name || ' ' || last_name, salary, hire_date
+   FROM EMPLOYEES
+   WHERE department_id = 90;
+
+      INSERT INTO EMP_INFO1
+      SELECT a.employee_id,
+      a.first_name || ' ' || a.last_name,
+      a.salary, a.hire_date, b.department_name,
+      d.country_name
+      FROM employees a, departments b,
+      locations c, countries d
+      WHERE a.department_id = b.department_id
+      AND b.location_id = c.location_id
+      AND c.country_id = d.country_id;
+
+ UPDATE 문
+  UPDATE emp
+   SET salary = 0
+   WHERE salary < 20000;
+   
+ DELETE 문
+  DELETE emp
+   WHERE emp_no in (101, 102);
+ 
+ COMMIT : 변경된 데이터 최종 저장
+ ROLLBACK : 변경 이전 상태로 회귀
+  
+ MERGE : INSERT와 UPDATE를 한 번에 처리
+ 
+ View : 테이블 데이터 보안 강화 -> 컬럼이나 ROW 접근 제한
+
+ 데이터 딕셔너리(Data Dictionary) : 오라클에서 제공하는 데이터베이스 객체(사용자, 테이블, 뷰 등)에 대한 메타정보를 담은 뷰, 이거로 변수 조회해서 사용하면 편할 듯 
+  SELECT ',a.' || column_name
+  FROM user_tab_cols
+  WHERE table_name = 'EMPLOYEES'
+  ORDER BY column_id ;
+ 
+ 
+ 
