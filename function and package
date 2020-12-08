@@ -173,18 +173,23 @@
         FROM employees a
         ORDER BY 1;
 
- 인라인 뷰 (Inline View)---- 가장 많이 사용 / 여러가지 계산식 있을 때?
-     SELECT a.department_id, a.employee_id,
-                             a.last_name, a.salary,
-                             k.department_id second_dept_id,
-                             k.avg_salary
-    FROM employees a,
-      (SELECT b.department_id, AVG(b.salary) avg_salary
-      FROM employees b
-      GROUP BY b.department_id
-      ) k
-    WHERE a.department_id = k.department_id
-    ORDER BY a.department_id;
+ 인라인 뷰 (Inline View)------ 여러 개의 테이블을 조인하는 복잡한 쿼리 작성 시, 일단 인라인뷰 형태로 일부를 작성한 후, 나머지 조인  복잡성 해소 측면
+  ex) 사원의 급여를 회사 전체 평균 급여와 해당 사원이 속한 부서 평균 급여와 비교하라
+    SELECT a.employee_id,
+            a.first_name || ' ' || a.last_name emp_name,
+            a.department_id,
+            a.salary, b.dept_avg_sal, c.all_avg_sal
+      FROM employees a,
+      ( SELECT department_id,
+      ROUND(AVG(salary),0) dept_avg_sal
+      FROM employees
+      GROUP BY department_id ) b
+      
+      ,( SELECT ROUND(AVG(salary),0) all_avg_sal
+      FROM employees ) c
+      
+      WHERE a.department_id = b.department_id
+      ORDER BY 1 ;
 
 
 중첩쿼리
@@ -199,23 +204,15 @@
       ORDER BY 1;
 
                      
--EXIST(존재하는지를 체크)
+-EXIST(존재하는지를 체크) --- 이게 더 좋음 
   SELECT *
     FROM departments a
-    WHERE EXISTS
-            ( SELECT 1 #1은 아무의미 없음
-            FROM employees b
-            WHERE a.department_id = b.department_id
-            ) ;
+    WHERE EXISTS ( SELECT 'A'
+    FROM employees b
+    WHERE a.department_id = b.department_id
+    AND b.salary > 10000
+    );
 
-   SELECT department_id, employee_id, last_name, salary
-    FROM employees a
-    WHERE salary > (SELECT AVG(salary)
-                    FROM employees b
-                    WHERE a.department_id = b.department_id
-                    group by b.department_id)
-    ORDER BY department_id;
- 
  
 세미 조인 (Semi Join) : 두 번째 테이블에 있는 로우와 조건이 맞는 첫 번째 테이블의 로우 반환 **
  SELECT *                                                    SELECT *
